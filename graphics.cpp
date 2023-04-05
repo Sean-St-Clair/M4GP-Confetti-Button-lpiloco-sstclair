@@ -80,21 +80,26 @@ void kbd(unsigned char key, int x, int y) {
 }
 
 void kbdS(int key, int x, int y) {
+    // The amount of pixels to be moved
+    int moveSpeed = 3;
+    int moveX = 0;
+    int moveY = 0;
     switch (key) {
         case GLUT_KEY_DOWN:
-
+            moveY += moveSpeed;
             break;
         case GLUT_KEY_LEFT:
-
+            moveX -= moveSpeed;
             break;
         case GLUT_KEY_RIGHT:
-
+            moveX += moveSpeed;
             break;
         case GLUT_KEY_UP:
-
+            moveY -= moveSpeed;
             break;
     }
-
+    // Moves the spawn button TODO: if on the correct scene
+    spawn.move(moveX, moveY);
     glutPostRedisplay();
 }
 
