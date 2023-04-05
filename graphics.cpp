@@ -10,6 +10,7 @@ GLdouble width, height;
 int wd;
 Button spawn({1, 0, 0}, {100, 100}, 100, 50, "Spawn");
 vector<Quad> confetti;
+enum screen {start, conf, end};
 
 void spawnConfetti() {
     confetti.push_back(Quad({rand() % 10 / 10.0, rand() % 10 / 10.0, rand() % 10 / 10.0},
@@ -48,11 +49,13 @@ void display() {
      * Draw here
      */
 
-    spawn.draw();
-
-    for (const Quad &piece: confetti) {
-        piece.draw();
+    glColor3f(1, 1, 1);
+    glRasterPos2i(250, 250);
+    for (const char &letter: "Test Label") {
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, letter);
     }
+
+
 
     glFlush();  // Render now
 }
@@ -63,6 +66,14 @@ void kbd(unsigned char key, int x, int y) {
     if (key == 27) {
         glutDestroyWindow(wd);
         exit(0);
+    } else if (key == 115) {
+        spawn.draw();
+
+        for (const Quad &piece: confetti) {
+            piece.draw();
+        }
+
+        glFlush();
     }
 
     glutPostRedisplay();
