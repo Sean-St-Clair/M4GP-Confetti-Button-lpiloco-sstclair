@@ -10,7 +10,9 @@ GLdouble width, height;
 int wd;
 Button spawn({1, 0, 0}, {100, 100}, 100, 50, "Spawn");
 vector<Quad> confetti;
-enum screen {start, conf, end};
+enum screen {start, conf, final};
+screen currentScreen = start;
+int confettiCount = 98;
 
 void spawnConfetti() {
     confetti.push_back(Quad({rand() % 10 / 10.0, rand() % 10 / 10.0, rand() % 10 / 10.0},
@@ -48,11 +50,46 @@ void display() {
     /*
      * Draw here
      */
+    switch (currentScreen) {
+        case start:
+            glColor3f(1, 1, 1);
+            glRasterPos2i(50, 150);
+            for (const char &letter: "Welcome to Sean St Confetti's Personal") {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, letter);
+            }
 
-    glColor3f(1, 1, 1);
-    glRasterPos2i(250, 250);
-    for (const char &letter: "Test Label") {
-        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, letter);
+            glColor3f(1, 1, 1);
+            glRasterPos2i(175, 200);
+            for (const char &letter: "Confetti Button") {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, letter);
+            }
+
+            glColor3f(1, 1, 1);
+            glRasterPos2i(165, 275);
+            for (const char &letter: "Press the 's' key") {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, letter);
+            }
+            break;
+        case conf:
+            spawn.draw();
+
+            for (const Quad &piece: confetti) {
+                piece.draw();
+            }
+            break;
+        case final:
+            glColor3f(1, 1, 1);
+            glRasterPos2i(50, 150);
+            for (const char &letter: "Well done spawning 100 pieces of confetti,") {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, letter);
+            }
+
+            glColor3f(1, 1, 1);
+            glRasterPos2i(175, 200);
+            for (const char &letter: "you can leave now.") {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, letter);
+            }
+            break;
     }
 
 
@@ -66,15 +103,10 @@ void kbd(unsigned char key, int x, int y) {
     if (key == 27) {
         glutDestroyWindow(wd);
         exit(0);
-    } else if (key == 115) {
-        spawn.draw();
-
-        for (const Quad &piece: confetti) {
-            piece.draw();
-        }
-
-        glFlush();
+    } else if (key == 115){
+        currentScreen = conf;
     }
+
 
     glutPostRedisplay();
 }
@@ -124,6 +156,11 @@ void mouse(int button, int state, int x, int y) {
     // If the left button is up and the cursor is overlapping with the Button, call spawnConfetti.
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && spawn.isOverlapping(x, y)) {
         spawnConfetti();
+        if (confettiCount == 100) {
+            currentScreen = final;
+        } else {
+            ++confettiCount;
+        }
     }
     glutPostRedisplay();
 }
