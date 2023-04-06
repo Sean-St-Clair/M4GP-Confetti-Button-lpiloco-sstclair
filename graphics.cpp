@@ -10,9 +10,11 @@ GLdouble width, height;
 int wd;
 Button spawn({1, 0, 0}, {100, 100}, 100, 50, "Spawn");
 vector<Quad> confetti;
-enum screen {start, conf, final};
+enum screen {
+    start, conf, final
+};
 screen currentScreen = start;
-int confettiCount = 98;
+int confettiCount = 0;
 
 void spawnConfetti() {
     confetti.push_back(Quad({rand() % 10 / 10.0, rand() % 10 / 10.0, rand() % 10 / 10.0},
@@ -92,8 +94,6 @@ void display() {
             break;
     }
 
-
-
     glFlush();  // Render now
 }
 
@@ -103,10 +103,9 @@ void kbd(unsigned char key, int x, int y) {
     if (key == 27) {
         glutDestroyWindow(wd);
         exit(0);
-    } else if (key == 115){
+    } else if (key == 's' && currentScreen == start) {
         currentScreen = conf;
     }
-
 
     glutPostRedisplay();
 }
@@ -130,8 +129,10 @@ void kbdS(int key, int x, int y) {
             moveY -= moveSpeed;
             break;
     }
-    // Moves the spawn button TODO: if on the correct scene
-    spawn.move(moveX, moveY);
+    // Moves the spawn button
+    if (currentScreen == conf) {
+        spawn.move(moveX, moveY);
+    }
     glutPostRedisplay();
 }
 
@@ -147,6 +148,12 @@ void cursor(int x, int y) {
 // button will be GLUT_LEFT_BUTTON or GLUT_RIGHT_BUTTON
 // state will be GLUT_UP or GLUT_DOWN
 void mouse(int button, int state, int x, int y) {
+    // Only need to process mouse input on confetti screen
+    if (currentScreen != conf) {
+        glutPostRedisplay();
+        return;
+    }
+
     // If the left button is down and the cursor is overlapping with the Button, call the pressDown method. Otherwise, call the release method.
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && spawn.isOverlapping(x, y)) {
         spawn.pressDown();
@@ -155,11 +162,12 @@ void mouse(int button, int state, int x, int y) {
     }
     // If the left button is up and the cursor is overlapping with the Button, call spawnConfetti.
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && spawn.isOverlapping(x, y)) {
-        spawnConfetti();
-        if (confettiCount == 100) {
-            currentScreen = final;
-        } else {
+        if (confettiCount < 100) {
+            spawnConfetti();
             ++confettiCount;
+        }
+        if (confettiCount >= 100) {
+            currentScreen = final;
         }
     }
     glutPostRedisplay();
